@@ -15,7 +15,8 @@ def load_data() -> pd.DataFrame:
     Load raw dataset from CSV using a robust path.
     """
 
-    base_path = Path(__file__).resolve().parent.parent
+    # 🔥 CORREÇÃO AQUI (tiramos o .parent.parent)
+    base_path = Path(__file__).resolve().parent
     file_path = base_path / "Dados utilizados" / "Brazilian E-Commerce Public Dataset by Olist.csv"
 
     df = pd.read_csv(file_path, index_col=0)
@@ -32,10 +33,8 @@ def clean_data(df: pd.DataFrame) -> pd.DataFrame:
     Perform basic cleaning and type adjustments.
     """
 
-    # Padronizar nomes de colunas
     df.columns = df.columns.str.lower()
 
-    # Converter colunas de data
     date_cols = [
         "order_purchase_timestamp",
         "order_approved_at",
@@ -49,7 +48,6 @@ def clean_data(df: pd.DataFrame) -> pd.DataFrame:
         if col in df.columns:
             df[col] = pd.to_datetime(df[col], errors="coerce")
 
-    # Remover duplicatas
     df = df.drop_duplicates()
 
     return df
@@ -64,13 +62,8 @@ def create_target(df: pd.DataFrame) -> pd.DataFrame:
     Create revenue, cost (proxy) and profit.
     """
 
-    # Receita
     df["revenue"] = df["payment_value"]
-
-    # Custo estimado (proxy)
     df["cost"] = df["freight_value"] + (0.6 * df["price"])
-
-    # Lucro
     df["profit"] = df["revenue"] - df["cost"]
 
     return df
@@ -101,7 +94,8 @@ def save_data(df: pd.DataFrame):
     Save processed dataset.
     """
 
-    base_path = Path(__file__).resolve().parent.parent
+    # 🔥 mesma correção aqui
+    base_path = Path(__file__).resolve().parent
     output_path = base_path / "data" / "processed"
 
     output_path.mkdir(parents=True, exist_ok=True)
